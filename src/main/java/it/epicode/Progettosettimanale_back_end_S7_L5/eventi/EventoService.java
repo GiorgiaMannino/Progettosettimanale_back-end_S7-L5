@@ -5,32 +5,27 @@ import it.epicode.Progettosettimanale_back_end_S7_L5.auth.Role;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.server.ResponseStatusException;
+
 
 import java.util.List;
 
 @Service
-@Validated
 public class EventoService {
-
 
     @Autowired
     private EventoRepository eventoRepository;
 
-
-    // Metodo per trasformare un oggetto Evento in EventoResponse
-    private EventoResponse toResponse(Evento evento) {
+    // Trasformo un Evento in EventoResponse
+    public EventoResponse toResponse(Evento evento) {
         EventoResponse response = new EventoResponse();
         BeanUtils.copyProperties(evento, response);
         response.setOrganizzatore(evento.getOrganizzatore().getUsername());
         return response;
     }
 
-    // Recupera tutti gli eventi
+    // Recupero tutti gli eventi
     public List<EventoResponse> getAll() {
         return eventoRepository.findAll()
                 .stream()
@@ -38,7 +33,7 @@ public class EventoService {
                 .toList();
     }
 
-    // Recupera un evento specifico tramite ID
+    // Recupero un evento con id
     public EventoResponse getById(Long id) {
         Evento evento = eventoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Evento non trovato con id: " + id));
@@ -50,7 +45,6 @@ public class EventoService {
         if (!organizzatore.getRoles().contains(Role.ROLE_ORGANIZER)) {
             throw new AccessDeniedException("Non sei autorizzato a creare un nuovo evento.");
         }
-
         Evento evento = new Evento();
         evento.setTitolo(request.getTitolo());
         evento.setDescrizione(request.getDescrizione());
@@ -62,8 +56,7 @@ public class EventoService {
         return toResponse(eventoRepository.save(evento));
     }
 
-
-    // Modifica un evento esistente
+    // Modifico un evento esistente
     public EventoResponse update(Long id, EventoRequest request, AppUser organizzatore) {
         Evento evento = eventoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Evento non trovato con id: " + id));
@@ -71,7 +64,6 @@ public class EventoService {
         boolean isOwner = evento.getOrganizzatore().getId().equals(organizzatore.getId());
         boolean isOrganizer = organizzatore.getRoles().contains(Role.ROLE_ORGANIZER);
 
-        // Controllo per verificare se l'utente è l'organizzatore e il proprietario dell'evento
         if (isOrganizer && isOwner) {
             evento.setTitolo(request.getTitolo());
             evento.setDescrizione(request.getDescrizione());
@@ -80,16 +72,13 @@ public class EventoService {
             evento.setNumeroPostiDisponibili(request.getNumeroPostiDisponibili());
 
             eventoRepository.save(evento);
-            return toResponse(evento);  // Restituisce l'EventoResponse
+            return toResponse(evento);
         } else {
             throw new AccessDeniedException("Non sei autorizzato a modificare questo evento.");
         }
     }
 
-
-
-
-    // Elimina un evento
+    // Elimino un evento
     public void delete(Long id, AppUser organizzatore) {
         Evento evento = eventoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Evento non trovato con id: " + id));
@@ -97,7 +86,6 @@ public class EventoService {
         boolean isOwner = evento.getOrganizzatore().getId().equals(organizzatore.getId());
         boolean isOrganizer = organizzatore.getRoles().contains(Role.ROLE_ORGANIZER);
 
-        // Controllo per verificare se l'utente è l'organizzatore e il proprietario dell'evento
         if (isOrganizer && isOwner) {
             eventoRepository.delete(evento);
         } else {
@@ -105,4 +93,9 @@ public class EventoService {
         }
     }
 
+    public Evento getEventoById(Long id) {
+        return eventoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Evento non trovato con id: " + id));
+    }
 }
+

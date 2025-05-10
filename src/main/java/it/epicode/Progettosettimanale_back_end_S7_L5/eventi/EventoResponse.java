@@ -17,6 +17,5 @@ public class EventoResponse {
     private LocalDate data;
     private String luogo;
     private int numeroPostiDisponibili;
-    private int postiPrenotati;
     private String organizzatore;
 }

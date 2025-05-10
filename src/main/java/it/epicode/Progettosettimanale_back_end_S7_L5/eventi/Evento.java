@@ -35,9 +35,6 @@ public class Evento {
     @Column (nullable = false)
     private int numeroPostiDisponibili;
 
-    @Column(nullable = false)
-    private int postiPrenotati;
-
     @ManyToOne
     private AppUser organizzatore;
 
