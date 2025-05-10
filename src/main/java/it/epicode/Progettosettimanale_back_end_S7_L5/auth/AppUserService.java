@@ -66,4 +66,15 @@ public class AppUserService {
 
         return appUser;
     }
+
+    public AppUser getUserById(Long id) {
+        return appUserRepository.findById(id).orElseThrow(() -> new RuntimeException("Utente non trovato"));
+    }
+
+    public AppUser getUserByUsername(String username) {
+        return appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
+    }
+
+
 }
