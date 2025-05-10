@@ -1,0 +1,11 @@
+package it.epicode.Progettosettimanale_back_end_S7_L5.auth;
+
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface AppUserRepository extends JpaRepository<AppUser, Long> {
+    Optional<AppUser> findByUsername(String username);
+    boolean existsByUsername(String username);
+}
